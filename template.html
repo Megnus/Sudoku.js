@@ -104,15 +104,41 @@
 		for (i = 0; i < 3; i++)
 			for (j = 0; j < 3; j++)
 				array.push(new point(i,j));
-		compare(0, 0, array)
+
+		if (!singleValFilter(x,y,array)) {
+			if (!arrayFilter(0, 0, array)) {
+				// brute force
+			}
+		}
 	}
 
-	function compare(x, y, array) {
-		var i, j, k, count = 0;
-		var temp = [];
-		var flag;
+	/* Get area-array */
+	function getQuadrant(n,m) {
+		var array = [];
+		for (i = (n - 1) * 3; i < n * 3; i++)
+			for (j = (m - 1); j < m * 3; j++)
+				array.push(new point(i,j));
+		return array;
+	}
 
-		if ( numValInArray(cube[x][y]) === 1 ) {
+	function getRow(i) {
+		var array = [];
+		for (j = 0; j < 9; j++)
+			array.push(new point(i,j));
+		return array;
+	}
+
+	function getColumn(j) {
+		var array = [];
+		for (i = 0; i < 9; i++)
+			array.push(new point(i,j));
+		return array;
+	}
+
+	/* Filter */
+
+	function singleValFilter(x,y,array) {
+		if ( arrayValCount(cube[x][y]) === 1 ) {
 			for (k in cube[x][y]) {
 				if (cube[x][y][k] != 0)
 					break;
@@ -121,8 +147,15 @@
 			for (i in array) {
 				cube[array[i].x][array[i].y][k] = 0;
 			}
-			return;
+			return true;
 		}
+		return false;
+	}
+
+	function arrayFilter(x,y,array) {
+		var i, j, k, count = 0;
+		var temp = [];
+		var flag;
 
 		for (i in array)
 			if (compareAssociativeArrays( cube[x][y], cube[array[i].x][array[i].y] )) {
@@ -130,9 +163,9 @@
 				temp.push(array[i]);
 			}
 
-		if (count >= numValInArray(cube[x][y]))
-			for(k = 1; k < 10; k++)
-				if (cube[x][y][k] > 0)
+		if (count >= arrayValCount(cube[x][y])) {
+			for(k = 1; k < 10; k++) {
+				if (cube[x][y][k] > 0) {
 					for (i in array) {
 						flag = false;
 						for (var z in temp)
@@ -144,9 +177,16 @@
 							console.log(cube[array[i].x][array[i].y][k]);
 						}
 					}
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
-	function numValInArray(array) {
+	/* Sub methods */
+
+	function arrayValCount(array) { /* Used in: singleValFilter, arrayFilter */
 		var count = 0;
 		for (var i in array)
 			if (array[i] > 0) {
@@ -156,51 +196,27 @@
 		return count;
 	}
 
+	function compareAssociativeArrays(a, b) { /* Used in: arrayFilter */
+		if (a == b)
+			return true;
 
-	// function compare() {
-	// 	var num, tempNum = 0;
-	// 	for (var i = 0; i < 9; i++)
-	// 		for (var j = 0; j < 9; j++) {
-	// 			num = returnNumberOfVal(cube[i][j]);
-	// 			if (cube[i][j][0] === 0)
-	// 				for (var x = 0; x < 9; x++)
-	// 					for (var y = 0; y < 9; y++)
-	// 						if (compareAssociativeArrays(cube[i][j], cube[x][y]))
+		if (nrKeys(a) != nrKeys(b))
+			return false;
 
-	// 						//cube[x][y][cube[i][j][0]] = 0;
-	// 						console.log(
-	// 							compareAssociativeArrays( cube[i][j], cube[x][y] )
-	// 						);
-	// 		}
-	// }
-
-
-	function nrKeys(a) {
-		var i = 0;
 		for (key in a) {
-			i++;
+			if (a[key] != b[key])
+				return false;
 		}
+
+		return true;
+	}
+
+	function nrKeys(a) { /* Used in: compareAssociativeArrays */
+		var i = 0;
+		for (key in a)
+			i++;
 		return i;
 	}
-
-	function compareAssociativeArrays(a, b) {
-
-		if (a == b) {
-			return true;
-		}
-
-		if (nrKeys(a) != nrKeys(b)) {
-			return false;
-		}
-
-		for (key in a) {
-			if (a[key] != b[key]) {
-				return false;
-			}
-		}
-	return true;
-	}
-
 	/*****************************************/
 
 	function setRaw() {
