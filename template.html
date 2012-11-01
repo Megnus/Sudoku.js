@@ -11,6 +11,14 @@
 
 	var cube = [];
 
+	rek(10);
+
+	function rek(x) {
+		if ( x !=  0 )
+			rek(x--);
+
+	}
+
 	function makeBoard() {
 		var i,j;
 		var row = new Array(9);
@@ -100,42 +108,46 @@
 	}
 
 	function checkFirst() {
-		var array = [];
-		for (i = 0; i < 3; i++)
-			for (j = 0; j < 3; j++)
-				array.push(new point(i,j));
 
-		if (!singleValFilter(x,y,array)) {
+		var array = getQuadrant(1,1);
+		//var array = getRow(0);
+
+
+		if (!singleValFilter(0, 0,array)) {
 			if (!arrayFilter(0, 0, array)) {
 				// brute force
 			}
 		}
 	}
 
-	/* Get area-array */
+	/********* Get area-array *********/
+
 	function getQuadrant(n,m) {
 		var array = [];
-		for (i = (n - 1) * 3; i < n * 3; i++)
-			for (j = (m - 1); j < m * 3; j++)
+		for (i = n * 3; i < (n + 1) * 3; i++)
+			for (j = m * 3; j < (m + 1) * 3; j++)
+				//if ( i != ) <--------------------- Not (x,y)
 				array.push(new point(i,j));
 		return array;
 	}
 
-	function getRow(i) {
+	function getColumn(i) {
 		var array = [];
 		for (j = 0; j < 9; j++)
+						//<--------------------- Not (x,y)
 			array.push(new point(i,j));
 		return array;
 	}
 
-	function getColumn(j) {
+	function getRow(j) {
 		var array = [];
 		for (i = 0; i < 9; i++)
+				//<--------------------- Not (x,y)
 			array.push(new point(i,j));
 		return array;
 	}
 
-	/* Filter */
+	/************* Filter ***********/
 
 	function singleValFilter(x,y,array) {
 		if ( arrayValCount(cube[x][y]) === 1 ) {
