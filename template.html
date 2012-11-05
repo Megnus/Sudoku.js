@@ -51,7 +51,7 @@
 		cube[6][0][1] = 0;
 		cube[6][0][2] = 0;
 		cube[6][0][3] = 3;
-		cube[6][0][4] = 4;
+		cube[6][0][4] = 0;
 		cube[6][0][5] = 0;
 		cube[6][0][6] = 0;
 		cube[6][0][7] = 0;
@@ -69,9 +69,9 @@
 		cube[6][2][8] = 0;
 		cube[6][2][9] = 0;
 
-		var rowArray = getRows();
-		var colArray = getColumns();
-		var quadrantArray = getQuadrants();
+		var colArray = getArray( 9, obversePoint ),
+			rowArray = getArray( 9, reversedPoint ),
+			quadrantArray = getQuadrants();
 
 		for (var x = 0; x < 9; x++) {
 			for (var y = 0; y < 9; y++) {
@@ -85,73 +85,76 @@
 		}
 	}
 
-	/********* compare arrays *********/
+	/********* objects *********/
 
 	function point(x,y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	/********* Get area-array *********/
+	obversePoint = function(x,y) {
+		return new point(x,y);
+	}
+
+	reversedPoint = function(x,y) {
+		return new point(y,x);
+	}
+
+	/********* Get arrays *********/
 
 	function getQuadrants() {
-		var array = [];
-		var tempArray = [];
-		for (var i = 0; i < 3; i++) {
-			for (var j = 0; j < 3; j++)
-				tempArray.push(getQuadrant(i,j));
+		var array = [],
+			tempArray = [],
+			getQuadrant = function(n,m) {
+				var array = [];
+				for (var i = n * 3; i < (n + 1) * 3; i++)
+					for (var j = m * 3; j < (m + 1) * 3; j++)
+							array.push(obversePoint(i,j));
+				return array;
+			}
+		return getArray(3, getQuadrant);
+	}
+
+	function getArray(max, func) {
+		var array = [],
+			tempArray = [];
+		for (var i = 0; i < max; i++) {
+			for (var j = 0; j < max; j++)
+				tempArray.push(func(i,j));
 			array.push(tempArray);
 			tempArray = [];
 		}
 		return array;
 	}
 
-	function getQuadrant(n,m) {
-		var array = [];
-		for (var i = n * 3; i < (n + 1) * 3; i++)
-			for (var j = m * 3; j < (m + 1) * 3; j++)
-					array.push(new point(i,j));
-		return array;
+	/***** Iteration methods *****/
+
+	function doubleIteration(min_x, max_x, min_y, max_y, func) {
+		for (var x = min_x; x < max_x; x++)
+			for (var y = min_y; y < max_y; y++)
+				func(x,y);
 	}
 
-	function getColumns() {
-		var array = [];
-		for (var i = 0; i < 9; i++) {
-			array.push(getColumn(i));
-		}
-
-		function getColumn(x) {
-			var array = [];
-			for (var i = 0; i < 9; i++)
-				array.push(new point(x,i));
-			return array;
-		}
-		return array;
-	}
-
-	function getRows() {
-		var array = [];
-		for (var i = 0; i < 9; i++) {
-			array.push(getRow(i));
-		}
-
-		function getRow(y) {
-			var array = [];
-			for (var i = 0; i < 9; i++)
-				array.push(new point(i,y));
-			return array;
-		}
-
-		return array;
+	function singleIteration(min_x, max_x, func) {
+		for (var x = min; x < max; x++)
+			func(x);
 	}
 
 	/************* Filter ***********/
 
-	function singleValFilter(x,y,array) { // make sure that in it is one value in first layer then all i set...
-		//console.log(array);
-		if ( arrayValCount(cube[x][y]) === 1 ) {
-			console.log( x + ' - ' + y);
+	function initFilter() {
+		for (var i = 0; i < 9; i++)
+			for (var j = 0; j < 9; j++)
+				if (cube[i][j][0] != 0)
+					for (var k = 1; k < 10; k++)
+						if (k != cube[i][j][0])
+							cube[i][j][k] = 0;
+						else
+							cube[i][j][k] = k;
+	}
 
+	function singleValFilter(x,y,array) { // make sure that in it is one value in first layer then all i set...
+		if ( arrayValCount(cube[x][y]) === 1 ) {
 			for (var k = 1; k < cube[x][y].length; k++ ) {
 				if (cube[x][y][k] != 0) {
 					break;
@@ -212,6 +215,7 @@
 	}
 
 	function compareAssociativeArrays(a, b) { /* Used in: arrayFilter */
+
 		if (a == b)
 			return true;
 
@@ -223,14 +227,14 @@
 				return false;
 		}
 
-		return true;
-	}
+		function nrKeys(a) {
+			var i = 0;
+			for (key in a)
+				i++;
+			return i;
+		}
 
-	function nrKeys(a) { /* Used in: compareAssociativeArrays */
-		var i = 0;
-		for (key in a)
-			i++;
-		return i;
+		return true;
 	}
 
 	/*************************/
