@@ -8,16 +8,7 @@
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script>
 
-
 	var cube = [];
-
-	// rek(10);
-
-	// function rek(x) {
-	// 	if ( x !=  0 )
-	// 		rek(x--);
-
-	// }
 
 	function makeBoard() {
 		var i,j;
@@ -36,7 +27,6 @@
 				for (k = 0; k < 10; k++)
 					cube[i][j][k] = k;
 
-
 		// cube[0][0][0] = 1;
 		// cube[0][1][0] = 2;
 		// cube[0][2][0] = 3;
@@ -46,85 +36,60 @@
 		// cube[2][0][0] = 7;
 		// cube[2][1][0] = 8;
 
-		cube[0][0][0] = 0;
-		cube[0][0][1] = 0;
-		cube[0][0][2] = 2;
-		cube[0][0][3] = 0;
-		cube[0][0][4] = 0;
-		cube[0][0][5] = 0;
-		cube[0][0][6] = 0;
-		cube[0][0][7] = 0;
-		cube[0][0][8] = 0;
-		cube[0][0][9] = 0;
+		// cube[0][0][0] = 0;
+		// cube[0][0][1] = 0;
+		// cube[0][0][2] = 2;
+		// cube[0][0][3] = 3;
+		// cube[0][0][4] = 0;
+		// cube[0][0][5] = 0;
+		// cube[0][0][6] = 0;
+		// cube[0][0][7] = 0;
+		// cube[0][0][8] = 0;
+		// cube[0][0][9] = 0;
 
-		cube[1][1][0] = 0;
-		cube[1][1][1] = 0;
-		cube[1][1][2] = 2;
-		cube[1][1][3] = 3;
-		cube[1][1][4] = 0;
-		cube[1][1][5] = 0;
-		cube[1][1][6] = 0;
-		cube[1][1][7] = 0;
-		cube[1][1][8] = 0;
-		cube[1][1][9] = 0;
+		cube[6][0][0] = 0;
+		cube[6][0][1] = 0;
+		cube[6][0][2] = 0;
+		cube[6][0][3] = 3;
+		cube[6][0][4] = 4;
+		cube[6][0][5] = 0;
+		cube[6][0][6] = 0;
+		cube[6][0][7] = 0;
+		cube[6][0][8] = 0;
+		cube[6][0][9] = 0;
 
+		cube[6][2][0] = 0;
+		cube[6][2][1] = 0;
+		cube[6][2][2] = 0;
+		cube[6][2][3] = 3;
+		cube[6][2][4] = 4;
+		cube[6][2][5] = 0;
+		cube[6][2][6] = 0;
+		cube[6][2][7] = 0;
+		cube[6][2][8] = 0;
+		cube[6][2][9] = 0;
 
-		// filterQuadrants();
-		// filterRowCol();
-		// filterRaw();
-		// setRaw();
-
-		// filterQuadrants();
-		// filterRowCol();
-		// filterRaw();
-		// setRaw();
-
-		checkFirst();
-
-		//compare();
-
-		for (i = 0; i < 10; i++) {
-			printCube(i);
-		}
-
-		//console.log(
-			//compareAssociativeArrays([1,2],[1,3])
-		//);
-	}
-	/*** compare arrays *********************/
-
-	// function returnNumberOfVal(array) {
-	// 	var num = 0;
-	// 	for (var i in array) {
-	// 		if ( array[i] != 0)
-	// 			num++;
-	// 	}
-	// 	retunr num;
-	// }
-
-	function point(x,y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	function checkFirst() {
-
-		//var array = getQuadrant(0,0);
-		//var array = getRow(0,0);
 		var rowArray = getRows();
 		var colArray = getColumns();
 		var quadrantArray = getQuadrants();
 
 		for (var x = 0; x < 9; x++) {
 			for (var y = 0; y < 9; y++) {
-
-				arrayFilter(x, y, colArray[y]);
-				arrayFilter(x, y, rowArray[x]);
+				arrayFilter(x, y, colArray[x]);
+				arrayFilter(x, y, rowArray[y]);
 				arrayFilter(x, y, quadrantArray[parseInt(x / 3)][parseInt(y / 3)]);
 			}
 		}
+		for (i = 0; i < 10; i++) {
+			printCube(i);
+		}
+	}
 
+	/********* compare arrays *********/
 
+	function point(x,y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	/********* Get area-array *********/
@@ -154,13 +119,13 @@
 		for (var i = 0; i < 9; i++) {
 			array.push(getColumn(i));
 		}
-		return array;
-	}
 
-	function getColumn(x) {
-		var array = [];
-		for (var i = 0; i < 9; i++)
-			array.push(new point(x,i));
+		function getColumn(x) {
+			var array = [];
+			for (var i = 0; i < 9; i++)
+				array.push(new point(x,i));
+			return array;
+		}
 		return array;
 	}
 
@@ -169,20 +134,24 @@
 		for (var i = 0; i < 9; i++) {
 			array.push(getRow(i));
 		}
-		return array;
-	}
 
-	function getRow(y) {
-		var array = [];
-		for (var i = 0; i < 9; i++)
+		function getRow(y) {
+			var array = [];
+			for (var i = 0; i < 9; i++)
 				array.push(new point(i,y));
+			return array;
+		}
+
 		return array;
 	}
 
 	/************* Filter ***********/
 
 	function singleValFilter(x,y,array) { // make sure that in it is one value in first layer then all i set...
+		//console.log(array);
 		if ( arrayValCount(cube[x][y]) === 1 ) {
+			console.log( x + ' - ' + y);
+
 			for (var k = 1; k < cube[x][y].length; k++ ) {
 				if (cube[x][y][k] != 0) {
 					break;
@@ -190,14 +159,15 @@
 			}
 			cube[x][y][0] = cube[x][y][k];
 			for (var i in array) {
-				if (array[i].x != x || array[i].y != y)
+				if (array[i].x != x || array[i].y != y) {
 					cube[array[i].x][array[i].y][k] = 0;
+					console.log(array[i].x + ' ' + array[i].y);
+				}
 			}
 			return true;
 		}
 		return false;
 	}
-
 
 	function arrayFilter(x,y,array) {
 		var i, j, k, count = 0;
@@ -229,7 +199,7 @@
 		}
 	}
 
-	/* Sub methods */
+	/******* Sub methods ******/
 
 	function arrayValCount(array) { /* Used in: singleValFilter, arrayFilter */
 		var count = 0;
@@ -262,79 +232,8 @@
 			i++;
 		return i;
 	}
-	/*****************************************/
 
-	function setRaw() {
-		var count, pos;
-		for (i = 0; i < 9; i++)
-		{
-			for (j = 0; j < 9; j++)
-			{
-				if ( cube[i][j][0] === 0) {
-					count = 0;
-
-					for (k = 1; k < 10; k++)
-					{
-						if (cube[i][j][k] != 0)
-						{
-							count++;
-							pos = cube[i][j][k];
-						}
-					}
-
-					if (count === 1) {
-
-						cube[i][j][0] = pos;
-					}
-				}
-			}
-		}
-	}
-
-	function filterRaw() {
-		var i, j;
-		for (i = 0; i < 9; i++)
-			for (j = 0; j < 9; j++)
-				for (k = 1; k < 10; k++)
-					if (cube[i][j][0] != 0)
-						cube[i][j][k] = 0;
-	}
-	/**********************/
-	function filterQuadrants() {
-		for (i = 0; i < 3; i++)
-			for (j = 0; j < 3; j++)
-				removeVal(3 * i, 3 * (i + 1), 3 * j, 3 * (j + 1));
-	}
-
-	function removeVal(min_i, max_i, min_j, max_j) { /* oboslete/ineffective algoritm*/
-		var i, j, x, y
-		for (i = min_i; i < max_i; i++)
-			for (j = min_j; j < max_j; j++)
-				if (cube[i][j][0] != 0)
-					for (x = min_i; x < max_i; x++)
-						for (y = min_j; y < max_j; y++)
-							cube[x][y][cube[i][j][0]] = 0;
-	}
-
-	/**********************/
-	function filterRowCol() {
-		var i, j;
-		for (i = 0; i < 9; i++)
-			for (j = 0; j < 9; j++)
-				xRay(i, j);
-	}
-
-	function xRay(x,y) {
-		var i, val = cube[x][y][0];
-		if (val != 0) {
-			for (i = 0; i < 9; i++)
-				cube[i][y][val] = 0;
-
-			for (i = 0; i < 9; i++)
-				cube[x][i][val] = 0;
-		}
-	}
-	/**********************/
+	/*************************/
 
 	function printCube(layerVal) {
 
