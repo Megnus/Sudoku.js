@@ -73,16 +73,15 @@
 			rowArray = getArray( 9, reversedPoint ),
 			quadrantArray = getQuadrants();
 
-		for (var x = 0; x < 9; x++) {
-			for (var y = 0; y < 9; y++) {
+		quadraticIteration(0, 9, function(x,y) {
 				arrayFilter(x, y, colArray[x]);
 				arrayFilter(x, y, rowArray[y]);
 				arrayFilter(x, y, quadrantArray[parseInt(x / 3)][parseInt(y / 3)]);
-			}
-		}
-		for (i = 0; i < 10; i++) {
-			printCube(i);
-		}
+			})
+
+		singleIteration(0, 10, function(x) {
+				printCube(x);
+			});
 	}
 
 	/********* objects *********/
@@ -104,13 +103,10 @@
 
 	function getQuadrants() {
 		var array = [],
-			tempArray = [],
 			getQuadrant = function(n,m) {
-				var array = [];
-				for (var i = n * 3; i < (n + 1) * 3; i++)
-					for (var j = m * 3; j < (m + 1) * 3; j++)
-							array.push(obversePoint(i,j));
-				return array;
+				doubleIteration(n * 3, (n + 1) * 3, m * 3, (m + 1) * 3, function(i,j) {
+					array.push(obversePoint(i,j));
+				} );
 			}
 		return getArray(3, getQuadrant);
 	}
@@ -129,13 +125,17 @@
 
 	/***** Iteration methods *****/
 
+	function quadraticIteration(min, max, func) {
+		doubleIteration(min, max, min, max, func);
+	}
+
 	function doubleIteration(min_x, max_x, min_y, max_y, func) {
 		for (var x = min_x; x < max_x; x++)
 			for (var y = min_y; y < max_y; y++)
 				func(x,y);
 	}
 
-	function singleIteration(min_x, max_x, func) {
+	function singleIteration(min, max, func) {
 		for (var x = min; x < max; x++)
 			func(x);
 	}
