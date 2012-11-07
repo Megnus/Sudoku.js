@@ -22,67 +22,73 @@
 			plane = [];
 		}
 
-		for (i = 0; i < 9; i++)
-			for (j = 0; j < 9; j++)
-				for (k = 0; k < 10; k++)
-					cube[i][j][k] = k;
+		/*var str =   "000 000 000"
+				  + "000 000 000"
+				  +	"000 000 100"
 
-		// cube[0][0][0] = 1;
-		// cube[0][1][0] = 2;
-		// cube[0][2][0] = 3;
-		// cube[1][0][0] = 4;
-		// cube[1][1][0] = 5;
-		// cube[1][2][0] = 6;
-		// cube[2][0][0] = 7;
-		// cube[2][1][0] = 8;
+				  +	"000 000 000"
+				  +	"000 000 000"
+				  +	"000 000 000"
 
-		// cube[0][0][0] = 0;
-		// cube[0][0][1] = 0;
-		// cube[0][0][2] = 2;
-		// cube[0][0][3] = 3;
-		// cube[0][0][4] = 0;
-		// cube[0][0][5] = 0;
-		// cube[0][0][6] = 0;
-		// cube[0][0][7] = 0;
-		// cube[0][0][8] = 0;
-		// cube[0][0][9] = 0;
+				  +	"000 000 000"
+				  +	"000 000 000"
+				  +	"000 000 000";*/
 
-		cube[6][0][0] = 0;
-		cube[6][0][1] = 0;
-		cube[6][0][2] = 0;
-		cube[6][0][3] = 3;
-		cube[6][0][4] = 0;
-		cube[6][0][5] = 0;
-		cube[6][0][6] = 0;
-		cube[6][0][7] = 0;
-		cube[6][0][8] = 0;
-		cube[6][0][9] = 0;
+		var str =   "060300804"
+				  + "537090000"
+				  +	"040006307"
+				  +	"090051238"
+				  +	"000000000"
+				  +	"713620040"
+				  +	"306400010"
+				  +	"000060523"
+				  +	"102009080";
 
-		cube[6][2][0] = 0;
-		cube[6][2][1] = 0;
-		cube[6][2][2] = 0;
-		cube[6][2][3] = 3;
-		cube[6][2][4] = 4;
-		cube[6][2][5] = 0;
-		cube[6][2][6] = 0;
-		cube[6][2][7] = 0;
-		cube[6][2][8] = 0;
-		cube[6][2][9] = 0;
+		strToarray(str);
+		intiCube();
 
 		var colArray = getArray( 9, obversePoint ),
 			rowArray = getArray( 9, reversedPoint ),
 			quadrantArray = getQuadrants();
 
-		quadraticIteration(0, 9, function(x,y) {
+
+	//	for (var i in quadrantArray)
+		//	console.log(quadrantArray[i]);
+
+
+		do {
+			quadraticIteration(0, 9, function(x,y) {
 				arrayFilter(x, y, colArray[x]);
 				arrayFilter(x, y, rowArray[y]);
-				arrayFilter(x, y, quadrantArray[parseInt(x / 3)][parseInt(y / 3)]);
+				arrayFilter(x, y, quadrantArray[parseInt(x/3) + parseInt(y/3)*3]);
 			})
+		} while(cleanUp())
+		 singleIteration(0, 10, function(x) {
+		 	printCube(x);
+		 });
 
-		singleIteration(0, 10, function(x) {
-				printCube(x);
-			});
+		//printCube(0);
 	}
+
+	/********* Init ************/
+
+	function strToarray(str) {
+		quadraticIteration(0,9,function(x,y){
+			cube[x][y][0] = str[y+x*9];
+		})
+	}
+
+	function intiCube() {
+		quadraticIteration(0,9,function(x,y){
+			singleIteration(1,10,function(z) {
+				if (cube[x][y][0] > 0 && cube[x][y][0] != z)
+					cube[x][y][z] = 0;
+				else
+					cube[x][y][z] = z;
+			})
+		})
+	}
+
 
 	/********* objects *********/
 
@@ -102,24 +108,31 @@
 	/********* Get arrays *********/
 
 	function getQuadrants() {
-		var array = [],
-			getQuadrant = function(n,m) {
+		var tempArray = [],
+			array = [];
+
+			quadraticIteration(0, 3, function(m,n) {
 				doubleIteration(n * 3, (n + 1) * 3, m * 3, (m + 1) * 3, function(i,j) {
-					array.push(obversePoint(i,j));
-				} );
-			}
-		return getArray(3, getQuadrant);
+					tempArray.push(obversePoint(i,j));
+				});
+				array.push(tempArray);
+				tempArray = [];
+			});
+
+		return array;
 	}
 
 	function getArray(max, func) {
 		var array = [],
 			tempArray = [];
-		for (var i = 0; i < max; i++) {
-			for (var j = 0; j < max; j++)
-				tempArray.push(func(i,j));
-			array.push(tempArray);
-			tempArray = [];
-		}
+			singleIteration(0, max, function(x) {
+				singleIteration(0, max, function(y) {
+					tempArray.push(func(x,y));
+				});
+				array.push(tempArray);
+				tempArray = [];
+			});
+
 		return array;
 	}
 
@@ -140,64 +153,88 @@
 			func(x);
 	}
 
+	function eachIteration(array, func) {
+		for (var i in array) {
+			func(i);
+		}
+	}
+
 	/************* Filter ***********/
 
+	function cleanUp() {
+		var cleaned = false;
+		quadraticIteration(0, 9, function(x,y) {
+			if (cube[x][y][0] < 1 && arrayValCount(cube[x][y]) === 1) {
+				for( var z = 1; z < 10; z++ ) {
+					if(cube[x][y][z] != 0) {
+						cube[x][y][0] = cube[x][y][z];
+						break;
+					}
+				}
+				cleaned = true;
+			}
+		});
+		return cleaned;
+	}
+
 	function initFilter() {
-		for (var i = 0; i < 9; i++)
-			for (var j = 0; j < 9; j++)
-				if (cube[i][j][0] != 0)
-					for (var k = 1; k < 10; k++)
-						if (k != cube[i][j][0])
-							cube[i][j][k] = 0;
-						else
-							cube[i][j][k] = k;
+		quadraticIteration(0,9, function(x,y) {
+			if (cube[x][y][0] != 0) {
+				singleIteration(0, 10, function(z) {
+					cube[x][y][0] != z ? cube[x][y][z] = 0 : cube[x][y][z] = z;
+				})
+			}
+		});
 	}
 
 	function singleValFilter(x,y,array) { // make sure that in it is one value in first layer then all i set...
-		if ( arrayValCount(cube[x][y]) === 1 ) {
-			for (var k = 1; k < cube[x][y].length; k++ ) {
-				if (cube[x][y][k] != 0) {
-					break;
-				}
+		var index;
+
+		singleIteration(1, cube[x][y].length, function(z) {
+			if (cube[x][y][z] != 0) index = z;
+		});
+
+		eachIteration(array, function(i) {
+			if (array[i].x != x || array[i].y != y) {
+				cube[array[i].x][array[i].y][index] = 0;
 			}
-			cube[x][y][0] = cube[x][y][k];
-			for (var i in array) {
-				if (array[i].x != x || array[i].y != y) {
-					cube[array[i].x][array[i].y][k] = 0;
-					console.log(array[i].x + ' ' + array[i].y);
-				}
-			}
-			return true;
-		}
-		return false;
+		})
 	}
 
+
 	function arrayFilter(x,y,array) {
-		var i, j, k, count = 0;
-		var temp = [];
-		var flag;
+		var i, j, k, bool,
+			count = 0;
+			tempArray = [],
+			num = arrayValCount(cube[x][y]);
+		//if (cube[x][y][0]>0) return;
 
-		if (singleValFilter(x, y, array))
-			return;
-
-		for (i in array)
-			if (compareAssociativeArrays( cube[x][y], cube[array[i].x][array[i].y] )) {
-				count++;
-				temp.push(array[i]);
-			}
-
-		if (count >= arrayValCount(cube[x][y])) {
-			for(k = 1; k < 10; k++) {
-				if (cube[x][y][k] > 0) {
-					for (i in array) {
-						flag = false;
-						for (var z in temp)
-							if ( array[i].x === temp[z].x && array[i].y === temp[z].y)
-								flag = true;
-						if (!flag)
-							cube[array[i].x][array[i].y][k] = 0;
-					}
+		if ( num === 1 )
+			singleValFilter(x, y, array);
+		else {
+			eachIteration(array, function(i) {
+				if (compareAssociativeArrays( cube[x][y], cube[array[i].x][array[i].y] )) {
+					count++;
+					tempArray.push(array[i]);
 				}
+			});
+
+			if (count >= num) {
+				singleIteration(1, 10, function(z) {
+					if (cube[x][y][z] > 0) {
+						eachIteration(array, function(i) {
+							bool = true;
+							eachIteration(tempArray, function(j) {
+								if ( array[i].x === tempArray[j].x && array[i].y === tempArray[j].y) {
+									bool = false;
+								}
+							});
+
+							if (bool)
+								cube[array[i].x][array[i].y][z] = 0;
+						});
+					}
+				});
 			}
 		}
 	}
@@ -206,11 +243,10 @@
 
 	function arrayValCount(array) { /* Used in: singleValFilter, arrayFilter */
 		var count = 0;
-		for (var i = 1; i < array.length; i++)
-			if (array[i] > 0) {
-				//console.log(array[i]);
+		singleIteration(1, array.length, function(i) {
+			if (array[i] > 0)
 				count++;
-			}
+		});
 		return count;
 	}
 
@@ -222,15 +258,16 @@
 		if (nrKeys(a) != nrKeys(b))
 			return false;
 
-		for (key in a) {
+		for (key in a)
 			if (a[key] != b[key])
 				return false;
-		}
 
 		function nrKeys(a) {
 			var i = 0;
+
 			for (key in a)
 				i++;
+
 			return i;
 		}
 
@@ -240,25 +277,20 @@
 	/*************************/
 
 	function printCube(layerVal) {
-
-		var str = "";
-		for (j = 0; j < 9; j++) {
-			for (i = 0; i < 9; i++)
-				str += cube[i][j][layerVal];
-			console.log(str);
+		var str;
+		singleIteration(0, 9, function(i) {
 			str = "";
-		}
-		console.log('-----------');
+			singleIteration(0, 9, function(j) {
+				str += cube[i][j][layerVal] + " ";
+			});
+			console.log(str);
+		});
+		console.log();
 	}
 
 	$(document).ready(function() {
-
-
 		makeBoard()
-
-
 		// Handler for .ready() called.
-
 	});
 
 </script>
