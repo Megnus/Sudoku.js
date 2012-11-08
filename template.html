@@ -25,6 +25,7 @@
 		}
 
 		var str = "108005006000000000503820700200150908000080000809042005005098204000000000900200601";
+		var str = "005090001000002073760008200012009004000203000300100960001900058970500000500030700";
 
 		strToarray(str);
 		printCube(0);
@@ -57,67 +58,45 @@
 		//printCube(0);
 	}
 
-		function cleanArray(x,y, arrays) {
-			var cleaned = false;
-			var count;
-			var foundit;
+	function cleanArray(x,y,arrays) {
+		var count;
 
-			//quadraticIteration(0, 9, function(x,y) {
+		if (cube[x][y][0] > 0)
+			return;
 
-			if (cube[x][y][0] < 1) {
-				for( var z = 1; z < 10; z++ ) {
-					if(cube[x][y][z] > 0) {
-						foundit = false;
-						// also check down in the arrays
-						for (var q in arrays) {
-							count = 0;
-							for (var i in arrays[q]) {
-								if (cube[arrays[q][i].x][arrays[q][i].y][z] > 0) {
-									count++;
-								}
-							}
+		for(var z = 1; z < 10; z++) {
+			if(cube[x][y][z] < 1)
+				continue;
 
-							if ( count === 1 ) {
-								// Found it -- Now clean it all
-								foundit = true;
-							}
-						}
+			for (var q in arrays) {
+				count = 0;
+				for (var i in arrays[q]) {
+					if (count > 1)
+						break;
+					else if (cube[arrays[q][i].x][arrays[q][i].y][z] > 0)
+						count++;
+				}
 
-						if (foundit) {
-							for (var q in arrays) {
-								for (var i in arrays[q]) {
-									if (arrays[q][i].x != x && arrays[q][i].y != y) {
-										cube[arrays[q][i].x][arrays[q][i].y][z] = 0;
-									}
-								}
-							}
-							for( var p = 1; p < 10; p++ ) {
-								if (p != z) {
-									cube[x][y][p] = 0;
-								}
-							}
-							break;
-						}
+				if ( count === 1 )
+					break;
+			}
+
+			if (count === 1) {
+				for (var q in arrays) {
+					for (var i in arrays[q]) {
+						if (arrays[q][i].x != x && arrays[q][i].y != y)
+							cube[arrays[q][i].x][arrays[q][i].y][z] = 0;
 					}
 				}
-				//cleaned = tru
+				for(var p = 1; p < 10; p++) {
+					if (p != z)
+						cube[x][y][p] = 0;
+				}
+				break;
 			}
-		//});
-		//return cleaned;
+		}
 	}
 
-
-	// function cleanArray(x,y, array) {
-	// 	if (cube[x][y][0] < 1) {
-	// 		for (var t = 1; t < 10; t++ ) {
-	// 			for(var i in array) {
-	// 				var obj = arrayValCount(cube[x][y][t]);
-	// 				if (obj.count === 1)
-	// 					cube[x][y][0] = obj.pos;
-	// 			}
-	// 		}
-	// 	}
-	// }
 
 	/********* Init ************/
 
