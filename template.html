@@ -15,14 +15,14 @@
 		var row = new Array(9);
 		var plane = [];
 
-	//	singleIteration(0,9, )
-
-		for (i = 0; i < 9; i++) {
-			for (j = 0; j < 9; j++)
+		singleIteration(0,9,function(){
+			singleIteration(0,9,function(){
 				plane.push(new Array(10));
+			});
 			cube.push(plane);
 			plane = [];
-		}
+		});
+
 
 		var str = "108005006000000000503820700200150908000080000809042005005098204000000000900200601";
 		var str = "005090001000002073760008200012009004000203000300100960001900058970500000500030700";
@@ -33,17 +33,33 @@
 
 		var colArray = getArray( 9, obversePoint ),
 			rowArray = getArray( 9, reversedPoint ),
-			quadrantArray = getQuadrants();
+			quadrantArray = getQuadrants(),
+			packetArray;
+
+					eachIteration(quadrantArray, function(x) {
+		 	console.log(quadrantArray[x]);
+		 });
+
 		for (var g = 0; g < 20; g++) {
 			do {
 				quadraticIteration(0, 9, function(x,y) {
-					arrayFilter(x, y, colArray[x]);
-					arrayFilter(x, y, rowArray[y]);
-					arrayFilter(x, y, quadrantArray[parseInt(x/3) + parseInt(y/3)*3]);
+					packetArray = [
+						colArray[x],
+						rowArray[y],
+						quadrantArray[parseInt(x/3) + parseInt(y/3)*3]
+					];
+					eachIteration(packetArray, function(i) {
+						arrayFilter(x, y, packetArray[i]);
+					});
 				});
 			} while(cleanUp())
 			quadraticIteration(0, 9, function(x,y) {
-				cleanArray(x,y,[colArray[x],rowArray[y],quadrantArray[parseInt(x/3) + parseInt(y/3)*3]]);
+				packetArray = [
+					colArray[x],
+					rowArray[y],
+					quadrantArray[parseInt(x/3) + parseInt(y/3)*3]
+				];
+				arraysFilter(x,y,packetArray);
 			});
 
 		}
@@ -54,47 +70,77 @@
 		 singleIteration(0, 30, function(x) {
 		 	console.log();
 		 });
-
-		//printCube(0);
 	}
 
-	function cleanArray(x,y,arrays) {
-		var count;
 
-		if (cube[x][y][0] > 0)
-			return;
+//sortera in alla som  quadrantArray[x][0].x == quadrantArray[y][0].x
+// och quadrantArray[x][0].y == quadrantArray[y][0].y
 
-		for(var z = 1; z < 10; z++) {
-			if(cube[x][y][z] < 1)
-				continue;
+// [T[0][0].x + T[0][1].x + T[0][2].x, T[0][3].x + T[0][4].x + T[0][5].x, T[0][6].x + T[0][7].x + T[0][8].x]
+// [T[0][0].y + T[0][3].y + T[0][6].y, T[0][1].y + T[0][4].y + T[0][7].y, T[0][2].y + T[0][5].y + T[0][8].y]
 
-			for (var q in arrays) {
-				count = 0;
-				for (var i in arrays[q]) {
-					if (count > 1)
-						break;
-					else if (cube[arrays[q][i].x][arrays[q][i].y][z] > 0)
-						count++;
-				}
+// var x = 255;
+// alert(x.toString(2));
+// alert(parseInt(x.toString(2),2));
+// char aChar = anotherPalindrome.charAt(9);
+// fruits.join(" and ");
 
-				if ( count === 1 )
-					break;
-			}
+// ---	000
+// 	001 x
+// 	010 x
+// 	100 x
+// 	011 ab b-b
+// 	101 ab c-c
+// 	110    d -d
+// 	111
 
-			if (count === 1) {
-				for (var q in arrays) {
-					for (var i in arrays[q]) {
-						if (arrays[q][i].x != x && arrays[q][i].y != y)
-							cube[arrays[q][i].x][arrays[q][i].y][z] = 0;
-					}
-				}
-				for(var p = 1; p < 10; p++) {
-					if (p != z)
-						cube[x][y][p] = 0;
-				}
-				break;
+// 001
+// 010
+// 100
+// 011-011
+// 101-101
+// 110-110
+
+// if( A < 4 ) rensa A på B och C
+// if( B < 4 ) rensa B på A och C
+// if( C < 4 ) rensa C på A och B
+
+// if(A != 7 and A == B) rensa A is 0 på C
+// if(A != 7 and A == C) rensa A is 0 på B
+//if(A != 7 and B == C) rensa B is 0 på A
+
+
+	function quadrantRowColFilter() {
+		aq(tal, array);
+	}
+
+	function aq(tal, array, A) { // calc wich rows are affected by a sertain number
+		var tempRow = [false,false,false];
+		var tempCol = [false,false,false];
+		//var res = [;]
+
+		var array = quadrantArray[t];
+
+		for (var i in array) {
+			if (cube[A[i].x][A[i].y][1] > 0) {
+				tempRow[A[i].y] = true;
+				tempRow[A[i].x] = true;
 			}
 		}
+		res.push([tempRow,]);
+
+
+		for (var i in array) {
+			for (var j in array[i]) {
+				if (array[j][i] === tal ) {
+					tempCol.push(true);
+					break;
+				}
+			}
+		}
+
+		return [tempRow, tempCol];
+
 	}
 
 
@@ -172,21 +218,70 @@
 	function doubleIteration(min_x, max_x, min_y, max_y, func) {
 		for (var x = min_x; x < max_x; x++)
 			for (var y = min_y; y < max_y; y++)
-				func(x,y);
+				if (func(x,y))
+					break;
+	}
+
+	function xxx(min, max, func) {
+		for (var x = min; x < max; x++)
+			if (func(x))
+				break;
 	}
 
 	function singleIteration(min, max, func) {
 		for (var x = min; x < max; x++)
-			func(x);
+			if (func(x))
+				break;
 	}
 
 	function eachIteration(array, func) {
-		for (var i in array) {
-			func(i);
-		}
+		for (var x in array)
+			if (func(x))
+				break;
 	}
 
 	/************* Filter ***********/
+
+	function arraysFilter(x,y,arrays) {
+		var count;
+
+		if (cube[x][y][0] > 0)
+			return;
+
+		singleIteration(1, 10, function(z){
+			if(cube[x][y][z] < 1)
+				return false;
+
+			eachIteration(arrays, function(i){
+				count = 0;
+				eachIteration(arrays[i], function(j) {
+					if (count > 1)
+						return true;
+					else if (cube[arrays[i][j].x][arrays[i][j].y][z] > 0)
+						count++;
+				});
+
+				if ( count === 1 )
+					return true;
+			});
+
+			if (count === 1) {
+				eachIteration(arrays, function(i) {
+					eachIteration(arrays[i], function(j) {
+						if (arrays[i][j].x != x && arrays[i][j].y != y)
+							cube[arrays[i][j].x][arrays[i][j].y][z] = 0;
+					});
+				});
+
+				singleIteration(1, 10, function(i) {
+					if (i != z)
+						cube[x][y][i] = 0;
+				})
+
+				return true;
+			}
+		});
+	}
 
 	function cleanUp() {
 		var cleaned = false;
