@@ -23,7 +23,6 @@
 			plane = [];
 		});
 
-
 		var str = "108005006000000000503820700200150908000080000809042005005098204000000000900200601";
 		var str = "005090001000002073760008200012009004000203000300100960001900058970500000500030700";
 
@@ -62,8 +61,8 @@
 				arraysFilter(x,y,packetArray);
 			});
 
-		}
-		 singleIteration(0, 10, function(x) {
+
+}		 singleIteration(0, 10, function(x) {
 		 	printCube(x);
 		 });
 
@@ -72,12 +71,54 @@
 		 });
 	}
 
-
 //sortera in alla som  quadrantArray[x][0].x == quadrantArray[y][0].x
 // och quadrantArray[x][0].y == quadrantArray[y][0].y
 
-// [T[0][0].x + T[0][1].x + T[0][2].x, T[0][3].x + T[0][4].x + T[0][5].x, T[0][6].x + T[0][7].x + T[0][8].x]
+// T[0] T[1] T[2] // first row
+// T[3] T[4] T[5] // second row
+// T[6] T[7] T[6] // third row
+// T[0] T[3] T[6] // first column
+// T[1] T[4] T[7] // second column
+// T[3] T[5] T[8] // third column
+
+// [cube[T[0][0].x][T[0][0].y][k]  + T[0][1].x + T[0][2].x, T[0][3].x + T[0][4].x + T[0][5].x, T[0][6].x + T[0][7].x + T[0][8].x]
 // [T[0][0].y + T[0][3].y + T[0][6].y, T[0][1].y + T[0][4].y + T[0][7].y, T[0][2].y + T[0][5].y + T[0][8].y]
+
+// cubeVal(T[0][0],k)
+
+function getXRayCube() {
+	var xRayCube = [];
+	for (var i in quadrant)
+		xRayCube.push(getXYLayer(quadrant[i]));
+	return xRayCube;
+}
+
+function getXYLayer(quadrant) {
+	array = [];
+	for (var i = 0; i < 3; i++) {
+		arrayX.push(getSumOfThreeX(quadrant,i,k));
+		arrayY.push(getSumOfThreeY(quadrant,i,k));
+	}
+	return [arrayX, arrayY];
+}
+
+function getSumOfThreeX(quadrant,startVal,layerVal) {
+	var sum = 0;
+	for (var i = 0; i < 3; i++)
+		sum += getCubeVal(quadrant[3*i+startVal],layerVal);
+	return sum;
+}
+
+function getSumOfThreeY(quadrant,startVal,layerVal) {
+	var sum = 0;
+	for (var i = 0; i < 3; i++)
+		sum += getCubeVal(quadrant[i+startVal],layerVal);
+	return sum;
+}
+
+function getCubeVal(input, layerVal) {
+	return cube[input.x][input.y][layerVal];
+}
 
 // var x = 255;
 // alert(x.toString(2));
